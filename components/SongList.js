@@ -11,12 +11,6 @@ import {
 import {colors} from "../assets/Themes/colors";
 import {useState} from "react";
 import {Ionicons} from "@expo/vector-icons";
-import {createStackNavigator} from "@react-navigation/stack";
-import {NavigationContainer} from "@react-navigation/native";
-// import {SongDetail, SongPreview} from "./WebViews";
-import SongDetailWeb from "./SongDetailWeb";
-
-const SongPreview = ({navigation}) => {};
 
 const dummyFunc = () => {
   console.log("clicked");
@@ -25,22 +19,36 @@ const dummyFunc = () => {
 const SongDisplay = ({navigation, item}) => {
   return (
     <View style={styles.SongContainer}>
-      <Pressable onPress={navigation.navigate(SongPreview)}>
+      <Pressable
+        onPress={(e) => {
+          e.stopPropagation();
+          navigation.navigate("SongPreviewWeb", {url: item["previewUrl"]});
+        }}
+        style={{marginLeft: 10, marginRight: -2}}>
         <Ionicons name="play-circle" size={20} color={colors.spotify} />
       </Pressable>
-      <Image source={{uri: item.imageUrl}} style={styles.SongLogo} />
-      <View style={styles.SongTitleContainer}>
-        <Text numberOfLines={1} style={styles.SongTitle}>
-          {item.songTitle}
+      <Pressable
+        onPress={(e) => {
+          e.stopPropagation();
+          navigation.navigate("SongDetailWeb", {url: item["externalUrl"]});
+        }}
+        style={styles.SongContainer}>
+        {/* <View> */}
+        <Image source={{uri: item.imageUrl}} style={styles.SongLogo} />
+        <View style={styles.SongTitleContainer}>
+          <Text numberOfLines={1} style={styles.SongTitle}>
+            {item.songTitle}
+          </Text>
+          <Text numberOfLines={1} style={styles.SongArtists}>
+            {item.appendArtists}
+          </Text>
+        </View>
+        <Text numberOfLines={1} style={styles.SongAlbum}>
+          {item.albumName}
         </Text>
-        <Text numberOfLines={1} style={styles.SongArtists}>
-          {item.appendArtists}
-        </Text>
-      </View>
-      <Text numberOfLines={1} style={styles.SongAlbum}>
-        {item.albumName}
-      </Text>
-      <Text style={styles.SongDuration}>{item.formatDuration}</Text>
+        <Text style={styles.SongDuration}>{item.formatDuration}</Text>
+        {/* </View> */}
+      </Pressable>
     </View>
   );
 };
@@ -66,19 +74,11 @@ const ParseData = ({tracks}) => {
   return tracks;
 };
 
-const SongTracks = ({navigation, tracks}) => {
+// albumName, duration, externalUrl, imageUrl, previewUrl
+// songArtists, songTitle, songNum, appendArtists, formatDuration
+export default function SongList({navigation, tracks}) {
   const [selectedID, setSelectedID] = useState();
-  return (
-    <View
-      style={{
-        alignContent: "center",
-        backgroundColor: "pink",
-        height: 1000,
-        width: 1000,
-      }}>
-      <Text style={{color: "white"}}>REEEEEEEEEEEEEEE</Text>
-    </View>
-  );
+  tracks = ParseData({tracks});
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -98,43 +98,16 @@ const SongTracks = ({navigation, tracks}) => {
       />
     </SafeAreaView>
   );
-};
-
-const Stack = createStackNavigator();
-// albumName, duration, externalUrl, imageUrl, previewUrl
-// songArtists, songTitle, songNum, appendArtists, formatDuration
-export default function SongList({tracks}) {
-  const [selectedID, setSelectedID] = useState();
-  tracks = ParseData({tracks});
-  console.log("parsed track #1:", tracks[0]);
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="SongDetailWeb">
-        <Stack.Screen
-          name="SongTracks"
-          component={SongTracks}
-          // options={{headerShown: false}}
-          initialParams={{tracks: tracks}}
-        />
-        <Stack.Screen
-          name="SongDetailWeb"
-          component={SongDetailWeb}
-          options={{title: "Song details"}}
-        />
-        <Stack.Screen
-          name="SongPreview"
-          component={SongPreview}
-          options={{title: "Song preview"}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
 }
-
-// export default SongList;
 
 const songHeight = Dimensions.get("window").height / 10;
 styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
   SongContainer: {
     flex: 1,
     backgroundColor: colors.background,

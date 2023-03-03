@@ -1,8 +1,8 @@
 import {View} from "react-native";
+import {WebView} from "react-native-webview";
 
-export default function SongDetailWeb() {
-  console.log("songdetailed logged");
-  return (
-    <View style={{backgroundColor: "pink", height: 1000, width: 1000}}></View>
-  );
+export default function SongPreviewWeb({route}) {
+  const {url} = route.params;
+  console.log(url);
+  return <WebView source={{uri: url}} />;
 }
